@@ -9,7 +9,7 @@ import javax.sound.sampled.AudioFormat.Encoding;
 
 
 /**
- * Class that allows directly passing PCM float mono
+ * Class that allows directly passing PCM float stereo
  * data to the sound card for playback. The sampling 
  * rate of the PCM data must be 44100Hz. 
  * 
@@ -25,17 +25,17 @@ public class AudioDevice
 	private final SourceDataLine out;
 	
 	/** buffer for BUFFER_SIZE 16-bit samples **/
-	private byte[] buffer = new byte[BUFFER_SIZE*2];
+	private byte[] buffer = new byte[BUFFER_SIZE*4];
 	
 	/**
 	 * Constructor, initializes the audio system for
-	 * 44100Hz 16-bit signed mono output. 
+	 * 44100Hz 16-bit signed stereo output.
 	 * 
 	 * @throws Exception in case the audio system could not be initialized
 	 */
 	public AudioDevice( ) throws Exception
 	{
-		AudioFormat format = new AudioFormat( Encoding.PCM_SIGNED, 44100, 16, 1, 2, 44100, false );
+		AudioFormat format = new AudioFormat( Encoding.PCM_SIGNED, 44100, 16, 2, 4, 44100, false );
 		out = AudioSystem.getSourceDataLine( format );
 		out.open(format);	
 		out.start();
@@ -43,36 +43,41 @@ public class AudioDevice
 	
 	/**
 	 * Writes the given samples to the audio device. The samples
-	 * have to be sampled at 44100Hz, mono and have to be in 
+	 * have to be sampled at 44100Hz, stereo and have to be in
 	 * the range [-1,1].
 	 * 
-	 * @param samples The samples.
+	 * @param samplesL The samples for the left ear.
+	 * @param samplesR The samples for the right ear.
 	 */
-	public void writeSamples( float[] samples )
+	public void writeSamples( float[] samplesL, float[] samplesR )
 	{
-		fillBuffer( samples );
+		fillBuffer( samplesL, samplesR );
 		out.write( buffer, 0, buffer.length );
 	}
 	
-	private void fillBuffer( float[] samples )
+	private void fillBuffer( float[] samplesL, float[] samplesR )
 	{
-		for( int i = 0, j = 0; i < samples.length; i++, j+=2 )
+		for( int i = 0, j = 0; i < samplesL.length; i++, j+=2 )
 		{
-			short value = (short)(samples[i] * Short.MAX_VALUE);
+			short value = (short)(samplesL[i] * Short.MAX_VALUE);
 			buffer[j] = (byte)(value | 0xff);
 			buffer[j+1] = (byte)(value >> 8 );
+
+			value = (short)(samplesR[i] * Short.MAX_VALUE);
+			buffer[j+2] = (byte)(value | 0xff);
+			buffer[j+3] = (byte)(value >> 8 );
 		}
 	}
 	
 	public static void main( String[] argv ) throws Exception
 	{
 		float[] samples = new float[1024];
-		WaveDecoder reader = new WaveDecoder( new FileInputStream( "samples/sample.wav" ) );
+		WaveDecoder reader = new WaveDecoder( new FileInputStream( "Birds.wav" ) );
 		AudioDevice device = new AudioDevice( );
 		
 		while( reader.readSamples( samples ) > 0 )
 		{
-			device.writeSamples( samples );
+			device.writeSamples( samples, samples );
 		}
 		
 		Thread.sleep( 10000 );

@@ -1,5 +1,6 @@
 package matt.mekha.hrtf
 
+import com.badlogic.audio.analysis.FFT
 import ucar.nc2.NetcdfFiles
 import java.util.*
 import kotlin.collections.HashMap
@@ -86,8 +87,11 @@ private const val speedOfSound = 343.0
 
 class HeadRelatedTransferFunction(sofaFilePath: String, private val headRadius : Double = 0.09) {
 
-    private val impulseResponseMap = HashMap<SphericalCoordinates, EnumMap<Ear, FastFourierTransform>>()
+    private val impulseResponseMap = HashMap<SphericalCoordinates, EnumMap<Ear, Pair<FFT, Double>>>()
     private val averageAverageMagnitude : Double
+
+    private val sampleRate: Double
+    private val numSamples: Int
 
     init {
         val file = NetcdfFiles.open(sofaFilePath)
@@ -95,9 +99,8 @@ class HeadRelatedTransferFunction(sofaFilePath: String, private val headRadius :
         val locationData = file.variables[2].read().copyToNDJavaArray() as Array<*>
         val impulseData = file.variables[6].read().copyToNDJavaArray() as Array<*>
 
-        val numSamples = ((impulseData[0] as Array<*>)[0] as DoubleArray).size.toDouble()
-        val sampleRate = (file.variables[7].read().copyTo1DJavaArray() as DoubleArray)[0]
-        val measurementDuration = numSamples / sampleRate
+        numSamples = ((impulseData[0] as Array<*>)[0] as DoubleArray).size
+        sampleRate = (file.variables[7].read().copyTo1DJavaArray() as DoubleArray)[0]
 
         val averageMagnitudes = ArrayList<Double>(locationData.size)
         for((i, measurement) in impulseData.withIndex()) {
@@ -108,9 +111,11 @@ class HeadRelatedTransferFunction(sofaFilePath: String, private val headRadius :
             val ears = measurement as Array<*>
             for((j, ear) in ears.withIndex()) {
                 val samples = ear as DoubleArray
-                val fft = FastFourierTransform({ samples[it] }, samples.size, measurementDuration)
-                impulseResponseMap[sphericalCoordinates]!![if (j == 0) Ear.LEFT else Ear.RIGHT] = fft
-                averageMagnitudes.add(fft.averageMagnitude)
+                val fft = FFT(numSamples, sampleRate.toFloat())
+                val averageMagnitude = samples.copyOf().map { it.absoluteValue }.average()
+
+                fft.forward(samples.mapTo(ArrayList<Float>(numSamples)) { it.toFloat() }.toFloatArray())
+                impulseResponseMap[sphericalCoordinates]!![if (j == 0) Ear.LEFT else Ear.RIGHT] = Pair(fft, averageMagnitude)
             }
         }
 
@@ -119,11 +124,11 @@ class HeadRelatedTransferFunction(sofaFilePath: String, private val headRadius :
 
     fun transfer(frequency: Double, amplitude: Double, sphericalCoordinates: SphericalCoordinates, ear: Ear) : Transformation {
         val closestSphericalCoordinates = sphericalCoordinates.getClosest(impulseResponseMap.keys)
-        val fft = impulseResponseMap[closestSphericalCoordinates]!![ear]!!
+        val (fft, averageMagnitude) = impulseResponseMap[closestSphericalCoordinates]!![ear]!!
 
-        val frequencyAttenuation = 1.0 + fft.getFrequencyAmplitude(frequency).magnitude
+        val frequencyAttenuation = 1.0 + fft.getBand((frequency / sampleRate * numSamples).toInt())
         val distanceAttenuation = (closestSphericalCoordinates.radius / sphericalCoordinates.radius).pow(2)
-        val earAttenuation = fft.averageMagnitude / averageAverageMagnitude
+        val earAttenuation = averageMagnitude / averageAverageMagnitude
 
         val distanceDelay = sphericalCoordinates.cartesianCoordinates.distanceTo(
                 CartesianCoordinates(0.0, ear.y * headRadius, 0.0)

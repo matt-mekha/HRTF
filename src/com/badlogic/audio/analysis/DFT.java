@@ -27,21 +27,21 @@ package com.badlogic.audio.analysis;
  * of the DFT are working properly. This implementation expects an even
  * <code>timeSize</code> and will throw and IllegalArgumentException if this
  * is not the case.
- * 
+ *
  * @author Damien Di Fede
- * 
+ *
  * @see FourierTransform
  * @see FFT
  * @see <a href="http://www.dspguide.com/ch8.htm">The Discrete Fourier Transform</a>
- * 
+ *
  */
 public class DFT extends FourierTransform
 {
   /**
-   * Constructs a DFT that expects audio buffers of length <code>timeSize</code> that 
-   * have been recorded with a sample rate of <code>sampleRate</code>. Will throw an 
+   * Constructs a DFT that expects audio buffers of length <code>timeSize</code> that
+   * have been recorded with a sample rate of <code>sampleRate</code>. Will throw an
    * IllegalArgumentException if <code>timeSize</code> is not even.
-   * 
+   *
    * @param timeSize the length of the audio buffers you plan to analyze
    * @param sampleRate the sample rate of the audio samples you plan to analyze
    */

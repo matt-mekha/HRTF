@@ -5,7 +5,7 @@ package com.badlogic.audio.analysis;
  * @author mzechner
  *
  */
-public class Signals 
+public class Signals
 {
 	public static float mean( float[] signal )
 	{
@@ -15,25 +15,25 @@ public class Signals
 		mean /= signal.length;
 		return mean;
 	}
-	
+
 	public static float energy( float[] signal )
 	{
 		float totalEnergy = 0;
-		for( int i = 0; i < signal.length; i++ )		
+		for( int i = 0; i < signal.length; i++ )
 			totalEnergy += (signal[i] * signal[i]);
 		return totalEnergy;
 	}
 
-	public static float power(float[] signal ) 
-	{	
+	public static float power(float[] signal )
+	{
 		return energy( signal ) / signal.length;
 	}
-	
+
 	public static float norm( float[] signal )
 	{
 		return (float)Math.sqrt( energy(signal) );
 	}
-	
+
 	public static float minimum( float[] signal )
 	{
 		float min = Float.POSITIVE_INFINITY;
@@ -41,7 +41,7 @@ public class Signals
 			min = Math.min( min, signal[i] );
 		return min;
 	}
-	
+
 	public static float maximum( float[] signal )
 	{
 		float max = Float.NEGATIVE_INFINITY;
@@ -49,7 +49,7 @@ public class Signals
 			max = Math.max( max, signal[i] );
 		return max;
 	}
-	
+
 	public static void scale( float[] signal, float scale )
 	{
 		for( int i = 0; i < signal.length; i++ )

@@ -48,6 +48,11 @@ public class MP3Decoder implements Decoder
 	}
 
 	@Override
+	public int getSampleRate() {
+		return (int) in.getFormat().getSampleRate();
+	}
+
+	@Override
 	public int readSamples(float[] samples) 
 	{
 		if( buffer == null || buffer.getSampleCount() < samples.length )

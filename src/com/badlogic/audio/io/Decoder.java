@@ -16,5 +16,7 @@ public interface Decoder
 	 * 
 	 * @param samples The number of read samples.
 	 */
+
 	public int readSamples( float[] samples );
+	public int getSampleRate();
 }

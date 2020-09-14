@@ -28,7 +28,12 @@ public class WaveDecoder implements Decoder
 	
 	/** sample rate in Herz**/
 	private final float sampleRate;
-	
+
+	@Override
+	public int getSampleRate() {
+		return (int) sampleRate;
+	}
+
 	/** **/
 	
 	/**
