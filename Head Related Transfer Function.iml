@@ -11,5 +11,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="library" name="netcdfAll-5.3.3" level="project" />
+    <orderEntry type="library" name="tritonus_share" level="project" />
   </component>
 </module>

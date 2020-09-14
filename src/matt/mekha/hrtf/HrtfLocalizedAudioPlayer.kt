@@ -13,20 +13,11 @@ class HrtfLocalizedAudioPlayer(private val hrtf: HeadRelatedTransferFunction, pr
     private val frequencies = List(500) { ((it + 1) * 20).toDouble() }
     private val sampleTime = (1000000000.0 / audioSource.sampleRate.toDouble()).toLong()
 
-    private val rdft: RollingDiscreteFourierTransform
-
     var isPlaying = false
 
     private val data = ArrayList<ArrayList<*>>()
 
     init {
-        rdft = RollingDiscreteFourierTransform(
-                audioSource.sampleFunction,
-                sampleWindowWidth,
-                sampleWindowDuration,
-                frequencies
-        )
-
         if(logToCsv) {
             val headers = ArrayList<String>()
             headers.add("Azimuth")
@@ -40,8 +31,6 @@ class HrtfLocalizedAudioPlayer(private val hrtf: HeadRelatedTransferFunction, pr
     }
 
     fun play() {
-        rdft.prepare()
-
         Thread {
             isPlaying = true
             while(isPlaying) {
@@ -74,7 +63,7 @@ class HrtfLocalizedAudioPlayer(private val hrtf: HeadRelatedTransferFunction, pr
     }
 
     private fun everySample() {
-        rdft.roll()
+        // TODO shift buffer
 
         val dataRow = ArrayList<Double>()
         if(logToCsv) {
@@ -85,32 +74,9 @@ class HrtfLocalizedAudioPlayer(private val hrtf: HeadRelatedTransferFunction, pr
         }
 
         for(ear in Ear.values()) {
-            val cdft = ComplexDiscreteFourierTransform(
-                    {
-                        val frequency = frequencies[it]
-                        val rawAmplitude = rdft.getFrequencyAmplitude(frequencies[it])
-                        val transformation = hrtf.transfer(
-                                frequency,
-                                rawAmplitude.magnitude,
-                                sphericalCoordinates,
-                                ear
-                        )
-                        val processedAmplitude = rawAmplitude * transformation.amplitude
-                        // TODO do something with transformation.delay
-
-                        rawAmplitude // TODO change back to processedAmplitude
-                    },
-                    frequencies.size,
-                    1.0,
-                    true
-            )
-
-            var localizedSample = 0.0//cdft.getFrequencyAmplitude(0.0).magnitude
-            for(frequency in frequencies) {
-                val amplitude = cdft.getFrequencyAmplitude(frequency)
-                localizedSample += amplitude.magnitude * cos(frequency * amplitude.theta)
-            }
-            localizedSample *= audioSource.sampleRate
+            // TODO FFT on buffer
+            // TODO HRTF adjustments
+            // TODO IFFT on buffer
 
             // TODO output this value to corresponding ear
 
