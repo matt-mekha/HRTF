@@ -7,7 +7,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.random.Random
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 class HrtfLocalizedAudioPlayer(
         private val hrtf: HeadRelatedTransferFunction,
@@ -17,11 +18,13 @@ class HrtfLocalizedAudioPlayer(
 ) {
 
     var sphericalCoordinates = SphericalCoordinates.forward
+    var volume = 1f
 
     private val sampleBufferSize = 1024
     private val sampleBufferDuration = sampleBufferSize.toDouble() / audioSource.sampleRate.toDouble()
 
     private val fft = FFT(sampleBufferSize, sampleBufferDuration.toFloat())
+    private val itdBufferOverflow = EnumMap<Ear, FloatArray>(Ear::class.java)
 
     var isPlaying = false
 
@@ -42,6 +45,8 @@ class HrtfLocalizedAudioPlayer(
     }
 
     fun playSync() {
+        itdBufferOverflow[Ear.LEFT] = FloatArray(0)
+        itdBufferOverflow[Ear.RIGHT] = FloatArray(0)
         isPlaying = true
         while(isPlaying) {
             everyXSamples()
@@ -74,24 +79,36 @@ class HrtfLocalizedAudioPlayer(
         if(samplesRead < sampleBufferSize) stop()
 
         val earSamples = EnumMap<Ear, FloatArray>(Ear::class.java)
+        val earDelays = EnumMap<Ear, Double>(Ear::class.java)
         for(ear in Ear.values()) {
             fft.forward(sampleBuffer)
             for(i in sampleBuffer.copyOfRange(0, sampleBufferSize/2).indices) {
-                if(i==0) continue
                 val frequency = i.toDouble() / sampleBufferDuration
                 val transformation = hrtf.transfer(
                         frequency,
                         sphericalCoordinates,
                         ear
                 )
-                //if(transformation.amplitude > 1.0) println(transformation.amplitude)
-                fft.scaleBand(i, transformation.amplitude.toFloat())
+                fft.scaleBand(i, transformation.amplitude.toFloat() * volume)
+                if(i==0) earDelays[ear] = transformation.delay
             }
             earSamples[ear] = FloatArray(sampleBufferSize)
             fft.inverse(earSamples[ear])
-
-            // TODO implement delay
         }
+
+        val interauralTimeDifference = earDelays[Ear.RIGHT]!! - earDelays[Ear.LEFT]!!
+        var interauralSampleDifference = (interauralTimeDifference * audioSource.sampleRate).roundToInt()
+        val delayedEar = if (interauralSampleDifference > 0) Ear.RIGHT else Ear.LEFT
+        val nonDelayedEar = if(delayedEar == Ear.RIGHT) Ear.LEFT else Ear.RIGHT
+        interauralSampleDifference = interauralSampleDifference.absoluteValue
+
+        val delayedEarSamples = itdBufferOverflow[delayedEar]!!.copyOf(interauralSampleDifference) +
+                earSamples[delayedEar]!!.copyOfRange(interauralSampleDifference, sampleBufferSize)
+
+        itdBufferOverflow[nonDelayedEar] = FloatArray(0)
+        itdBufferOverflow[delayedEar] = earSamples[delayedEar]!!.copyOfRange(sampleBufferSize - interauralSampleDifference, sampleBufferSize)
+
+        earSamples[delayedEar] = delayedEarSamples
 
         audioDevice.writeSamples(
                 earSamples[Ear.LEFT],

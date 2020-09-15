@@ -42,10 +42,12 @@ class Tests {
 
         var azimuth = 0.0
         while(player.isPlaying) {
-            player.sphericalCoordinates = SphericalCoordinates(azimuth, 0.0, 1.4)
-            //println(player.sphericalCoordinates)
+            player.sphericalCoordinates = SphericalCoordinates(azimuth, 0.0, 2.0)
+            println(player.sphericalCoordinates)
+
             azimuth = (azimuth + 15) % 360
-            Thread.sleep(250)
+
+            Thread.sleep(1000)
         }
 
         player.saveCsv()
