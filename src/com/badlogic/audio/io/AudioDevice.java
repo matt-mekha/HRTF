@@ -2,9 +2,7 @@ package com.badlogic.audio.io;
 
 import java.io.FileInputStream;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.*;
 import javax.sound.sampled.AudioFormat.Encoding;
 
 
@@ -47,6 +45,11 @@ public class AudioDevice
 	{
 		AudioFormat format = new AudioFormat( Encoding.PCM_SIGNED, sampleRate, 16, 2, 4, sampleRate, false );
 		out = AudioSystem.getSourceDataLine( format );
+		out.addLineListener(event -> {
+			if(event.getType() == LineEvent.Type.STOP) {
+				System.out.println("Buffer underflow!");
+			}
+		});
 		out.open(format);	
 		out.start();
 	}

@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.random.Random
 
 class HrtfLocalizedAudioPlayer(
         private val hrtf: HeadRelatedTransferFunction,
@@ -19,7 +20,6 @@ class HrtfLocalizedAudioPlayer(
 
     private val sampleBufferSize = 1024
     private val sampleBufferDuration = sampleBufferSize.toDouble() / audioSource.sampleRate.toDouble()
-    private val sampleTime = (1000.0 * sampleBufferDuration).toInt() - 5
 
     private val fft = FFT(sampleBufferSize, sampleBufferDuration.toFloat())
 
@@ -44,15 +44,7 @@ class HrtfLocalizedAudioPlayer(
     fun playSync() {
         isPlaying = true
         while(isPlaying) {
-            val startTime = System.currentTimeMillis()
             everyXSamples()
-            val elapsedTime = System.currentTimeMillis() - startTime
-
-            if(sampleTime - elapsedTime < 0) {
-                println("Max duration: $sampleTime, Actual: $elapsedTime")
-            } else {
-                Thread.sleep(sampleTime - elapsedTime)
-            }
         }
     }
 
@@ -69,7 +61,7 @@ class HrtfLocalizedAudioPlayer(
         if(logToCsv) {
             val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss"))
             synchronized(data) {
-                saveCsv("HRTF/HRTF_Localization_Data_$time.csv", data)
+                saveCsv("out/HRTF_Localization_Data_$time.csv", data)
             }
         } else {
             throw IllegalStateException("Log to CSV option was false, so no data is available to save.")
@@ -85,13 +77,14 @@ class HrtfLocalizedAudioPlayer(
         for(ear in Ear.values()) {
             fft.forward(sampleBuffer)
             for(i in sampleBuffer.copyOfRange(0, sampleBufferSize/2).indices) {
+                if(i==0) continue
                 val frequency = i.toDouble() / sampleBufferDuration
                 val transformation = hrtf.transfer(
                         frequency,
-                        fft.getFreq(frequency.toFloat()).toDouble(),
                         sphericalCoordinates,
                         ear
                 )
+                //if(transformation.amplitude > 1.0) println(transformation.amplitude)
                 fft.scaleBand(i, transformation.amplitude.toFloat())
             }
             earSamples[ear] = FloatArray(sampleBufferSize)

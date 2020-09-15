@@ -123,7 +123,7 @@ class HeadRelatedTransferFunction(sofaFilePath: String, private val headRadius :
         averageAverageMagnitude = averageMagnitudes.average()
     }
 
-    fun transfer(frequency: Double, amplitude: Double, sphericalCoordinates: SphericalCoordinates, ear: Ear) : Transformation {
+    fun transfer(frequency: Double, sphericalCoordinates: SphericalCoordinates, ear: Ear) : Transformation {
         val closestSphericalCoordinates = sphericalCoordinates.getClosest(impulseResponseMap.keys)
         val (fft, averageMagnitude) = impulseResponseMap[closestSphericalCoordinates]!![ear]!!
 
@@ -136,7 +136,7 @@ class HeadRelatedTransferFunction(sofaFilePath: String, private val headRadius :
         ) / speedOfSound
 
         return Transformation(
-                amplitude * frequencyAttenuation * distanceAttenuation * earAttenuation,
+                frequencyAttenuation * distanceAttenuation * earAttenuation,
                 distanceDelay
         )
     }
