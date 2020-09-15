@@ -17,7 +17,7 @@ public class WaveOutput
 	public static void main( String[] argv ) throws Exception
 	{
 		AudioDevice device = new AudioDevice( );
-		WaveDecoder decoder = new WaveDecoder( new FileInputStream( "samples/sample.wav" ) );
+		WaveDecoder decoder = new WaveDecoder( new FileInputStream( "res/Music.wav" ) );
 		float[] samples = new float[1024];
 		
 		while( decoder.readSamples( samples ) > 0 )

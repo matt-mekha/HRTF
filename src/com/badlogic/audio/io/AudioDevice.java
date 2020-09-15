@@ -33,9 +33,19 @@ public class AudioDevice
 	 * 
 	 * @throws Exception in case the audio system could not be initialized
 	 */
-	public AudioDevice( ) throws Exception
+	public AudioDevice() throws Exception {
+		this(44100);
+	}
+
+	/**
+	 * Constructor, initializes the audio system for
+	 * a custom frequency with 16-bit signed stereo output.
+	 *
+	 * @throws Exception in case the audio system could not be initialized
+	 */
+	public AudioDevice( int sampleRate ) throws Exception
 	{
-		AudioFormat format = new AudioFormat( Encoding.PCM_SIGNED, 44100, 16, 2, 4, 44100, false );
+		AudioFormat format = new AudioFormat( Encoding.PCM_SIGNED, sampleRate, 16, 2, 4, sampleRate, false );
 		out = AudioSystem.getSourceDataLine( format );
 		out.open(format);	
 		out.start();
@@ -62,16 +72,20 @@ public class AudioDevice
 	
 	private void fillBuffer( float[] samplesL, float[] samplesR )
 	{
-		for( int i = 0, j = 0; i < samplesL.length; i++, j+=2 )
+		for( int i = 0, j = 0; i < samplesL.length; i++, j+=4 )
 		{
-			short value = (short)(samplesL[i] * Short.MAX_VALUE);
+			short value = (short)(clamp(samplesL[i], -1f, 1f) * Short.MAX_VALUE);
 			buffer[j] = (byte)(value | 0xff);
 			buffer[j+1] = (byte)(value >> 8 );
 
-			value = (short)(samplesR[i] * Short.MAX_VALUE);
+			value = (short)(clamp(samplesR[i], -1f, 1f) * Short.MAX_VALUE);
 			buffer[j+2] = (byte)(value | 0xff);
 			buffer[j+3] = (byte)(value >> 8 );
 		}
+	}
+
+	private float clamp(float x, float min, float max) {
+		return Math.max(Math.min(x, max), min);
 	}
 	
 	public static void main( String[] argv ) throws Exception

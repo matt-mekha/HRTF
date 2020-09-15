@@ -13,17 +13,17 @@ class Tests {
     fun hrtfTest() {
         val hrtf = HeadRelatedTransferFunction(sofaFilePath = "HRTF/IRC_1003.sofa")
         val audioSource = WaveDecoder2("Birds.wav", 2)
-        val audioDevice = AudioDevice()
+        val audioDevice = AudioDevice(audioSource.sampleRate)
         val player = HrtfLocalizedAudioPlayer(hrtf, audioSource, audioDevice, logToCsv = true)
 
         player.playAsync()
 
         var azimuth = 0.0
         while(player.isPlaying) {
-            player.sphericalCoordinates = SphericalCoordinates(azimuth, 0.0, 5.0)
+            player.sphericalCoordinates = SphericalCoordinates(azimuth, 0.0, 2.0)
             println(player.sphericalCoordinates)
             azimuth = (azimuth + 15) % 360
-            Thread.sleep(125)
+            Thread.sleep(250)
         }
 
         player.saveCsv()

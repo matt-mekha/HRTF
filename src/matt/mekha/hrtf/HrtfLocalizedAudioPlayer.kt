@@ -19,7 +19,7 @@ class HrtfLocalizedAudioPlayer(
 
     private val sampleBufferSize = 1024
     private val sampleBufferDuration = sampleBufferSize.toDouble() / audioSource.sampleRate.toDouble()
-    private val sampleTime = 1000 * sampleBufferSize / audioSource.sampleRate
+    private val sampleTime = (1000.0 * sampleBufferDuration).toInt() - 5
 
     private val fft = FFT(sampleBufferSize, sampleBufferDuration.toFloat())
 
