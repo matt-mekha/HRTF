@@ -54,6 +54,11 @@ public class AudioDevice
 		fillBuffer( samplesL, samplesR );
 		out.write( buffer, 0, buffer.length );
 	}
+
+	public void writeSamples( float[] samples )
+	{
+		writeSamples(samples, samples);
+	}
 	
 	private void fillBuffer( float[] samplesL, float[] samplesR )
 	{

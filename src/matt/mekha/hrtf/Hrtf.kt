@@ -113,6 +113,7 @@ class HeadRelatedTransferFunction(sofaFilePath: String, private val headRadius :
                 val samples = ear as DoubleArray
                 val fft = FFT(numSamples, sampleRate.toFloat())
                 val averageMagnitude = samples.copyOf().map { it.absoluteValue }.average()
+                averageMagnitudes.add(averageMagnitude)
 
                 fft.forward(samples.mapTo(ArrayList<Float>(numSamples)) { it.toFloat() }.toFloatArray())
                 impulseResponseMap[sphericalCoordinates]!![if (j == 0) Ear.LEFT else Ear.RIGHT] = Pair(fft, averageMagnitude)

@@ -12,5 +12,6 @@
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="library" name="netcdfAll-5.3.3" level="project" />
     <orderEntry type="library" name="tritonus_share" level="project" />
+    <orderEntry type="library" name="junit-4.13" level="project" />
   </component>
 </module>

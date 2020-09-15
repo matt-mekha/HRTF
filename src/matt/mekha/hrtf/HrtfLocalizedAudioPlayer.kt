@@ -19,7 +19,7 @@ class HrtfLocalizedAudioPlayer(
 
     private val sampleBufferSize = 1024
     private val sampleBufferDuration = sampleBufferSize.toDouble() / audioSource.sampleRate.toDouble()
-    private val sampleTime = 1000000000 / audioSource.sampleRate * sampleBufferSize
+    private val sampleTime = 1000 * sampleBufferSize / audioSource.sampleRate
 
     private val fft = FFT(sampleBufferSize, sampleBufferDuration.toFloat())
 
@@ -30,6 +30,7 @@ class HrtfLocalizedAudioPlayer(
     init {
         if(logToCsv) {
             val headers = ArrayList<String>()
+            headers.add("Sample")
             headers.add("Azimuth")
             headers.add("Elevation")
             headers.add("Distance")
@@ -40,21 +41,24 @@ class HrtfLocalizedAudioPlayer(
         }
     }
 
-    fun play() {
-        Thread {
-            isPlaying = true
-            while(isPlaying) {
-                val startTime = System.nanoTime()
-                everyXSamples()
-                val elapsedTime = System.nanoTime() - startTime
+    fun playSync() {
+        isPlaying = true
+        while(isPlaying) {
+            val startTime = System.currentTimeMillis()
+            everyXSamples()
+            val elapsedTime = System.currentTimeMillis() - startTime
 
-                if(sampleTime - elapsedTime < 0) {
-                    //println("Max duration: $sampleTime, Actual: $elapsedTime")
-                } else {
-                    Thread.sleep(sampleTime - elapsedTime)
-                }
+            if(sampleTime - elapsedTime < 0) {
+                println("Max duration: $sampleTime, Actual: $elapsedTime")
+            } else {
+                Thread.sleep(sampleTime - elapsedTime)
             }
-        }.start()
+        }
+    }
+
+    fun playAsync() {
+        isPlaying = true
+        Thread(this::playSync).start()
     }
 
     fun stop() {
@@ -77,12 +81,10 @@ class HrtfLocalizedAudioPlayer(
         val samplesRead = audioSource.readSamples(sampleBuffer)
         if(samplesRead < sampleBufferSize) stop()
 
-        val dataRow = ArrayList<Double>()
-
         val earSamples = EnumMap<Ear, FloatArray>(Ear::class.java)
         for(ear in Ear.values()) {
             fft.forward(sampleBuffer)
-            for(i in sampleBuffer.indices) {
+            for(i in sampleBuffer.copyOfRange(0, sampleBufferSize/2).indices) {
                 val frequency = i.toDouble() / sampleBufferDuration
                 val transformation = hrtf.transfer(
                         frequency,
@@ -93,25 +95,29 @@ class HrtfLocalizedAudioPlayer(
                 fft.scaleBand(i, transformation.amplitude.toFloat())
             }
             earSamples[ear] = FloatArray(sampleBufferSize)
-            fft.inverse(fft.realPart.copyOf(), fft.imaginaryPart.copyOf(), earSamples[ear])
+            fft.inverse(earSamples[ear])
 
             // TODO implement delay
         }
 
-
+        audioDevice.writeSamples(
+                earSamples[Ear.LEFT],
+                earSamples[Ear.RIGHT]
+        )
 
         if(logToCsv) {
-            for((i, sample) in sampleBuffer.withIndex()) {
-                dataRow.add(sphericalCoordinates.azimuth)
-                dataRow.add(sphericalCoordinates.elevation)
-                dataRow.add(sphericalCoordinates.radius)
-                dataRow.add(sample.toDouble())
-                dataRow.add(earSamples[Ear.LEFT]!![i].toDouble())
-                dataRow.add(earSamples[Ear.RIGHT]!![i].toDouble())
-            }
-
             synchronized(data) {
-                data.add(dataRow)
+                for ((i, sample) in sampleBuffer.withIndex()) {
+                    val dataRow = ArrayList<Double>()
+                    dataRow.add(data.size.toDouble())
+                    dataRow.add(sphericalCoordinates.azimuth)
+                    dataRow.add(sphericalCoordinates.elevation)
+                    dataRow.add(sphericalCoordinates.radius)
+                    dataRow.add(sample.toDouble())
+                    dataRow.add(earSamples[Ear.LEFT]!![i].toDouble())
+                    dataRow.add(earSamples[Ear.RIGHT]!![i].toDouble())
+                    data.add(dataRow)
+                }
             }
         }
     }
