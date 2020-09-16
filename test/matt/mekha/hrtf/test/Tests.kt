@@ -14,7 +14,7 @@ class Tests {
 
     @Test
     fun audioTest() {
-        val audioSource = WaveDecoder2("res/Waves.wav", 2)
+        val audioSource = WaveDecoder2("res/Waves.wav")
         val audioDevice = AudioDevice(audioSource.sampleRate)
         val samples = FloatArray(1024)
 
@@ -25,7 +25,7 @@ class Tests {
 
     @Test
     fun stereoTest() {
-        val audioSource = WaveDecoder2("res/Waves.wav", 2)
+        val audioSource = WaveDecoder2("res/Waves.wav")
         val audioDevice = AudioDevice(audioSource.sampleRate)
         val samples = FloatArray(1024)
 
@@ -57,33 +57,33 @@ class Tests {
 
     @Test
     fun hrtfWavesCircularMotion() {
-        circularMotion(WaveDecoder2("res/Waves.wav", 2))
+        circularMotion(WaveDecoder2("Waves.wav"))
     }
 
     @Test
     fun hrtfBirdsCircularMotion() {
-        circularMotion(WaveDecoder2("res/Birds.wav", 2))
+        circularMotion(WaveDecoder2("res/Birds.wav"))
     }
 
     @Test
     fun hrtfFootstepsCircularMotion() {
-        circularMotion(WaveDecoder2("res/Footsteps.wav", 2), -45.0)
+        circularMotion(WaveDecoder2("res/Footsteps.wav"), -45.0)
     }
 
     @Test
     fun hrtfDogCircularMotion() {
-        circularMotion(WaveDecoder2("res/Dog.wav", 2))
+        circularMotion(WaveDecoder2("res/Dog.wav"))
     }
 
     @Test
     fun hrtfGunshotsCircularMotion() {
-        circularMotion(WaveDecoder2("res/Gunshots.wav", 2), 0.0)
+        circularMotion(WaveDecoder2("res/Gunshots.wav"), 0.0)
     }
 
     @Test
     fun hrtfGunshotsRandom() {
         val hrtf = HeadRelatedTransferFunction(sofaFilePath = "res/HRTF/IRC_1003.sofa")
-        val audioSource = WaveDecoder2("res/Gunshots.wav", 2)
+        val audioSource = WaveDecoder2("res/Gunshots.wav")
         val audioDevice = AudioDevice(audioSource.sampleRate)
         val player = HrtfLocalizedAudioPlayer(hrtf, audioSource, audioDevice, logToCsv = true)
 

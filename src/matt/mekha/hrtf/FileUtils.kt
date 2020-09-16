@@ -1,23 +1,26 @@
 package matt.mekha.hrtf
 
 import com.badlogic.audio.io.Decoder
+import com.badlogic.audio.io.MP3Decoder
 import java.io.File
+import java.io.InputStream
 import java.io.PrintWriter
+import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.nio.ByteBuffer
 import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioInputStream
 import javax.sound.sampled.AudioSystem
 
-fun getInternalFile(filePath: String) = Thread.currentThread().contextClassLoader.getResourceAsStream(filePath)
+fun getInternalFile(filePath: String): InputStream = Thread.currentThread().contextClassLoader.getResourceAsStream(filePath)!!
 
-class WaveDecoder2(filePath: String, private val bytesPerSample: Int = 1) : Decoder {
+class WaveDecoder2(filePath: String, private val bytesPerSample: Int = 2) : Decoder {
 
     private val audioFormatDecoded: AudioFormat
     private val audioInputStreamDecoded: AudioInputStream
 
     init {
-        val audioInputStreamEncoded: AudioInputStream = AudioSystem.getAudioInputStream(getInternalFile(filePath)!!.buffered())
+        val audioInputStreamEncoded: AudioInputStream = AudioSystem.getAudioInputStream(File(filePath))
         val audioFormatEncoded = audioInputStreamEncoded.format
         audioFormatDecoded = AudioFormat(
                 AudioFormat.Encoding.PCM_SIGNED,
@@ -58,6 +61,20 @@ class WaveDecoder2(filePath: String, private val bytesPerSample: Int = 1) : Deco
         }
 
         return samples.size
+    }
+}
+
+fun decodeAudioFile(file: File) : Decoder {
+    return when(file.extension) {
+        "wav" -> {
+            WaveDecoder2(file.path)
+        }
+        "mp3" -> {
+            MP3Decoder(file.inputStream())
+        }
+        else -> {
+            throw IllegalArgumentException("Unrecognized audio file extension.")
+        }
     }
 }
 
