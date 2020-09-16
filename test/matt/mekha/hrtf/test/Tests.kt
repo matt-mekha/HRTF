@@ -35,7 +35,7 @@ class Tests {
     }
 
     private fun circularMotion(audioSource: Decoder, elevation: Double = 0.0) {
-        val hrtf = HeadRelatedTransferFunction(sofaFilePath = "res/HRTF/MIT_KEMAR.sofa")
+        val hrtf = HeadRelatedTransferFunction(sofaFilePath = "res/HRTF/IRC_1003.sofa")
         val audioDevice = AudioDevice(audioSource.sampleRate)
         val player = HrtfLocalizedAudioPlayer(hrtf, audioSource, audioDevice, logToCsv = true)
 
@@ -61,6 +61,11 @@ class Tests {
     }
 
     @Test
+    fun hrtfBirdsCircularMotion() {
+        circularMotion(WaveDecoder2("res/Birds.wav", 2))
+    }
+
+    @Test
     fun hrtfFootstepsCircularMotion() {
         circularMotion(WaveDecoder2("res/Footsteps.wav", 2), -45.0)
     }
@@ -77,7 +82,7 @@ class Tests {
 
     @Test
     fun hrtfGunshotsRandom() {
-        val hrtf = HeadRelatedTransferFunction(sofaFilePath = "res/HRTF/MIT_KEMAR.sofa")
+        val hrtf = HeadRelatedTransferFunction(sofaFilePath = "res/HRTF/IRC_1003.sofa")
         val audioSource = WaveDecoder2("res/Gunshots.wav", 2)
         val audioDevice = AudioDevice(audioSource.sampleRate)
         val player = HrtfLocalizedAudioPlayer(hrtf, audioSource, audioDevice, logToCsv = true)
@@ -88,7 +93,7 @@ class Tests {
             player.sphericalCoordinates = SphericalCoordinates(round(Random.nextDouble() * 360.0), 0.0, 2.0)
             println(player.sphericalCoordinates)
 
-            Thread.sleep(4000)
+            Thread.sleep(3500)
         }
 
         player.saveCsv()

@@ -94,7 +94,7 @@ public class AudioDevice
 	public static void main( String[] argv ) throws Exception
 	{
 		float[] samples = new float[1024];
-		WaveDecoder reader = new WaveDecoder( new FileInputStream( "Birds.wav" ) );
+		WaveDecoder reader = new WaveDecoder( new FileInputStream("Birds.wav") );
 		AudioDevice device = new AudioDevice( );
 		
 		while( reader.readSamples( samples ) > 0 )

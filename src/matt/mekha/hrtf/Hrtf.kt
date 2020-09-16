@@ -1,7 +1,9 @@
 package matt.mekha.hrtf
 
 import com.badlogic.audio.analysis.FFT
+import ucar.nc2.NetcdfFile
 import ucar.nc2.NetcdfFiles
+import java.io.FileInputStream
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.*
@@ -127,13 +129,14 @@ class HeadRelatedTransferFunction(sofaFilePath: String, private val headRadius :
         val closestSphericalCoordinates = sphericalCoordinates.getClosest(impulseResponseMap.keys)
         val (fft, averageMagnitude) = impulseResponseMap[closestSphericalCoordinates]!![ear]!!
 
+        val earPosition = CartesianCoordinates(0.0, ear.y * headRadius, 0.0)
+        val distance = sphericalCoordinates.cartesianCoordinates.distanceTo(earPosition)
+
         val frequencyAttenuation = 1.0 + fft.getBand((frequency / sampleRate * numSamples).toInt())
-        val distanceAttenuation = (closestSphericalCoordinates.radius / sphericalCoordinates.radius).pow(2)
+        val distanceAttenuation = (closestSphericalCoordinates.cartesianCoordinates.distanceTo(earPosition) / distance).pow(2)
         val earAttenuation = averageMagnitude / averageAverageMagnitude
 
-        val distanceDelay = sphericalCoordinates.cartesianCoordinates.distanceTo(
-                CartesianCoordinates(0.0, ear.y * headRadius, 0.0)
-        ) / speedOfSound
+        val distanceDelay = distance / speedOfSound
 
         return Transformation(
                 frequencyAttenuation * distanceAttenuation * earAttenuation,

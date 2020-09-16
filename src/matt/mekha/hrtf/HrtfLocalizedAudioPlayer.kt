@@ -7,8 +7,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
+import kotlin.math.absoluteValue
 
 class HrtfLocalizedAudioPlayer(
         private val hrtf: HeadRelatedTransferFunction,

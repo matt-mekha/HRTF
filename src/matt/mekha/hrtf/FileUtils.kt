@@ -9,13 +9,15 @@ import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioInputStream
 import javax.sound.sampled.AudioSystem
 
+fun getInternalFile(filePath: String) = Thread.currentThread().contextClassLoader.getResourceAsStream(filePath)
+
 class WaveDecoder2(filePath: String, private val bytesPerSample: Int = 1) : Decoder {
 
     private val audioFormatDecoded: AudioFormat
     private val audioInputStreamDecoded: AudioInputStream
 
     init {
-        val audioInputStreamEncoded: AudioInputStream = AudioSystem.getAudioInputStream(File(filePath))
+        val audioInputStreamEncoded: AudioInputStream = AudioSystem.getAudioInputStream(getInternalFile(filePath)!!.buffered())
         val audioFormatEncoded = audioInputStreamEncoded.format
         audioFormatDecoded = AudioFormat(
                 AudioFormat.Encoding.PCM_SIGNED,
@@ -58,40 +60,6 @@ class WaveDecoder2(filePath: String, private val bytesPerSample: Int = 1) : Deco
         return samples.size
     }
 }
-
-//fun loadAudioFile(filePath: String, bytesPerSample: Int = 1) : AudioSource {
-//    val audioInputStreamEncoded: AudioInputStream = AudioSystem.getAudioInputStream(File(filePath))
-//    val audioFormatEncoded = audioInputStreamEncoded.format
-//    val audioFormatDecoded = AudioFormat(
-//            AudioFormat.Encoding.PCM_SIGNED,
-//            audioFormatEncoded.sampleRate,
-//            bytesPerSample * 8,
-//            1,
-//            bytesPerSample,
-//            audioFormatEncoded.sampleRate,
-//            true
-//    )
-//    val audioInputStreamDecoded = AudioSystem.getAudioInputStream(
-//            audioFormatDecoded,
-//            audioInputStreamEncoded
-//    )
-//
-//    return AudioSource(
-//            audioInputStreamDecoded.frameLength.toDouble() / audioFormatDecoded.frameRate,
-//            audioFormatDecoded.sampleRate.toInt(),
-//            {
-//                when (bytesPerSample) {
-//                    1 -> audioInputStreamDecoded.read().toDouble() / 128.0 - 1.0
-//                    2 -> ByteBuffer.wrap(audioInputStreamDecoded.readNBytes(bytesPerSample)).short.toDouble() / 32768.0
-//                    else -> 0.0
-//                }
-//            },
-//            {
-//                audioInputStreamDecoded.close()
-//                audioInputStreamEncoded.close()
-//            }
-//    )
-//}
 
 fun saveCsv(filePath: String, data: Iterable<Iterable<*>>) {
     val file = File(filePath)
