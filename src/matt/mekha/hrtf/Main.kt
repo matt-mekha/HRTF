@@ -2,8 +2,7 @@ package matt.mekha.hrtf
 
 import com.badlogic.audio.io.AudioDevice
 import com.badlogic.audio.io.Decoder
-import java.awt.BorderLayout
-import java.awt.Dimension
+import java.awt.*
 import java.io.File
 import javax.swing.*
 import javax.swing.filechooser.FileNameExtensionFilter
@@ -11,9 +10,6 @@ import kotlin.random.Random
 
 var sofaFile: File? = null
 var audioFile: File? = null
-
-const val padding = 20
-const val spacing = 5
 
 fun entryPoint() {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
@@ -25,13 +21,27 @@ fun entryPoint() {
 
     fun createFormPanel() {
         var formPanel = JPanel()
-        formPanel.layout = BoxLayout(formPanel, BoxLayout.Y_AXIS)
-        formPanel.border = BorderFactory.createEmptyBorder(padding, padding, padding, padding)
+        formPanel.size = window.size
+
+        val layout = GridBagLayout()
+        layout.columnWeights = doubleArrayOf(1.0, 1.0)
+        formPanel.layout = layout
 
         val title = JLabel("HRTF Demo")
-        formPanel.add(title)
+        title.horizontalAlignment = SwingConstants.CENTER
+        title.font = Font("Arial", Font.PLAIN, 20)
+        var constraints = GridBagConstraints()
+        constraints.gridx = 0
+        constraints.gridy = 0
+        constraints.gridwidth = 2
+        constraints.gridheight = 1
+        constraints.ipadx = 30
+        constraints.ipady = 30
+        constraints.fill = GridBagConstraints.HORIZONTAL
+        formPanel.add(title, constraints)
 
         val submitButton = JButton("Start Demo")
+        submitButton.font = Font("Arial", Font.PLAIN, 14)
         submitButton.isEnabled = false
         submitButton.addActionListener {
             formPanel.isVisible = false
@@ -63,18 +73,18 @@ fun entryPoint() {
             Thread { runDemo(decodeAudioFile(audioFile!!), sofaFile!!.path) }.start()
         }
 
-        fun createFileChooser(fileFilter: FileNameExtensionFilter, buttonText: String, onSelect: (File) -> Unit) {
+        fun createFileChooser(fileFilter: FileNameExtensionFilter, buttonText: String, y: Int, onSelect: (File) -> Unit) {
             val fileChooser = JFileChooser()
             fileChooser.fileFilter = fileFilter
             fileChooser.isAcceptAllFileFilterUsed = false
             fileChooser.currentDirectory = File(System.getProperty("user.dir"))
 
-            val fileChooserPanel = JPanel()
-            fileChooserPanel.layout = BoxLayout(fileChooserPanel, BoxLayout.X_AXIS)
-
             val fileChooserLabel = JLabel("")
+            fileChooserLabel.font = Font("Arial", Font.PLAIN, 14)
+            fileChooserLabel.horizontalAlignment = SwingConstants.CENTER
 
             val fileChooserButton = JButton(buttonText)
+            fileChooserButton.font = Font("Arial", Font.PLAIN, 14)
             fileChooserButton.addActionListener {
                 val returnVal = fileChooser.showOpenDialog(null)
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -84,33 +94,55 @@ fun entryPoint() {
                 submitButton.isEnabled = (sofaFile != null && audioFile != null)
             }
 
-            fileChooserPanel.add(fileChooserButton)
-            fileChooserPanel.add(Box.createRigidArea(Dimension(spacing, 0)))
-            fileChooserPanel.add(fileChooserLabel)
-            formPanel.add(Box.createRigidArea(Dimension(0, spacing)))
-            formPanel.add(fileChooserPanel)
+            constraints = GridBagConstraints()
+            constraints.gridx = 0
+            constraints.gridy = y
+            constraints.gridwidth = 1
+            constraints.gridheight = 1
+            constraints.ipadx = 30
+            constraints.ipady = 30
+            constraints.fill = GridBagConstraints.HORIZONTAL
+            formPanel.add(fileChooserButton, constraints)
+
+            constraints = GridBagConstraints()
+            constraints.gridx = 1
+            constraints.gridy = y
+            constraints.gridwidth = 1
+            constraints.gridheight = 1
+            constraints.ipadx = 30
+            constraints.ipady = 30
+            constraints.fill = GridBagConstraints.HORIZONTAL
+            formPanel.add(fileChooserLabel, constraints)
         }
 
         createFileChooser(
                 FileNameExtensionFilter("SOFA Files", "sofa"),
-                "Select HRTF..."
+                "Select HRTF...", 1
         ) {
             sofaFile = it
         }
 
         createFileChooser(
                 FileNameExtensionFilter("Audio Files", "wav", "mp3"),
-                "Select Audio..."
+                "Select Audio...", 2
         ) {
             audioFile = it
         }
 
-        formPanel.add(Box.createRigidArea(Dimension(0, spacing)))
-        formPanel.add(submitButton)
+        constraints = GridBagConstraints()
+        constraints.gridx = 1
+        constraints.gridy = 3
+        constraints.gridwidth = 2
+        constraints.gridheight = 1
+        constraints.ipadx = 30
+        constraints.ipady = 30
+        constraints.fill = GridBagConstraints.HORIZONTAL
+        formPanel.add(submitButton, constraints)
 
         window.contentPane.add(formPanel, BorderLayout.LINE_START)
     }
 
     createFormPanel()
+    window.pack()
     window.isVisible = true
 }
