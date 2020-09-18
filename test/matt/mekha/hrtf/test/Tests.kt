@@ -14,7 +14,7 @@ class Tests {
 
     @Test
     fun audioTest() {
-        val audioSource = WaveDecoder2("res/Waves.wav")
+        val audioSource = WaveDecoder2("test-resources/Waves.wav")
         val audioDevice = AudioDevice(audioSource.sampleRate)
         val samples = FloatArray(1024)
 
@@ -25,7 +25,7 @@ class Tests {
 
     @Test
     fun stereoTest() {
-        val audioSource = WaveDecoder2("res/Waves.wav")
+        val audioSource = WaveDecoder2("test-resources/Waves.wav")
         val audioDevice = AudioDevice(audioSource.sampleRate)
         val samples = FloatArray(1024)
 
@@ -35,7 +35,7 @@ class Tests {
     }
 
     private fun circularMotion(audioSource: Decoder, elevation: Double = 0.0) {
-        val hrtf = HeadRelatedTransferFunction(sofaFilePath = "res/HRTF/IRC_1003.sofa")
+        val hrtf = HeadRelatedTransferFunction(sofaFilePath = "test-resources/HRTF/IRC_1003.sofa")
         val audioDevice = AudioDevice(audioSource.sampleRate)
         val player = HrtfLocalizedAudioPlayer(hrtf, audioSource, audioDevice, logToCsv = true)
 
@@ -62,28 +62,28 @@ class Tests {
 
     @Test
     fun hrtfBirdsCircularMotion() {
-        circularMotion(WaveDecoder2("res/Birds.wav"))
+        circularMotion(WaveDecoder2("test-resources/Birds.wav"))
     }
 
     @Test
     fun hrtfFootstepsCircularMotion() {
-        circularMotion(WaveDecoder2("res/Footsteps.wav"), -45.0)
+        circularMotion(WaveDecoder2("test-resources/Footsteps.wav"), -45.0)
     }
 
     @Test
     fun hrtfDogCircularMotion() {
-        circularMotion(WaveDecoder2("res/Dog.wav"))
+        circularMotion(WaveDecoder2("test-resources/Dog.wav"))
     }
 
     @Test
     fun hrtfGunshotsCircularMotion() {
-        circularMotion(WaveDecoder2("res/Gunshots.wav"), 0.0)
+        circularMotion(WaveDecoder2("test-resources/Gunshots.wav"), 0.0)
     }
 
     @Test
     fun hrtfGunshotsRandom() {
-        val hrtf = HeadRelatedTransferFunction(sofaFilePath = "res/HRTF/IRC_1003.sofa")
-        val audioSource = WaveDecoder2("res/Gunshots.wav")
+        val hrtf = HeadRelatedTransferFunction(sofaFilePath = "test-resources/HRTF/IRC_1003.sofa")
+        val audioSource = WaveDecoder2("test-resources/Gunshots.wav")
         val audioDevice = AudioDevice(audioSource.sampleRate)
         val player = HrtfLocalizedAudioPlayer(hrtf, audioSource, audioDevice, logToCsv = true)
 

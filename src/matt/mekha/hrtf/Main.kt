@@ -15,7 +15,6 @@ fun entryPoint() {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
 
     val window = JFrame("HRTF Demo")
-    window.size = Dimension(500, 500)
     window.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     window.isResizable = false
 
@@ -24,12 +23,12 @@ fun entryPoint() {
         formPanel.size = window.size
 
         val layout = GridBagLayout()
-        layout.columnWeights = doubleArrayOf(1.0, 1.0)
+        layout.columnWidths = intArrayOf(150, 150)
         formPanel.layout = layout
 
         val title = JLabel("HRTF Demo")
         title.horizontalAlignment = SwingConstants.CENTER
-        title.font = Font("Arial", Font.PLAIN, 20)
+        title.font = Font("Arial", Font.BOLD, 20)
         var constraints = GridBagConstraints()
         constraints.gridx = 0
         constraints.gridy = 0
@@ -41,7 +40,7 @@ fun entryPoint() {
         formPanel.add(title, constraints)
 
         val submitButton = JButton("Start Demo")
-        submitButton.font = Font("Arial", Font.PLAIN, 14)
+        submitButton.font = Font("Arial", Font.BOLD, 14)
         submitButton.isEnabled = false
         submitButton.addActionListener {
             formPanel.isVisible = false
@@ -49,6 +48,13 @@ fun entryPoint() {
             formPanel = JPanel()
 
             fun runDemo(audioSource: Decoder, sofaFilePath: String) {
+                window.size = Dimension(500, 500)
+                window.layout = BorderLayout()
+
+                val person = JLabel(ImageIcon("Images/Person.png"))
+                person.size = Dimension(50, 50)
+                window.add(person, BorderLayout.CENTER)
+
                 val hrtf = HeadRelatedTransferFunction(sofaFilePath)
                 val audioDevice = AudioDevice(audioSource.sampleRate)
                 val player = HrtfLocalizedAudioPlayer(hrtf, audioSource, audioDevice)
@@ -88,7 +94,11 @@ fun entryPoint() {
             fileChooserButton.addActionListener {
                 val returnVal = fileChooser.showOpenDialog(null)
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    fileChooserLabel.text = fileChooser.selectedFile.name
+                    var truncatedName = fileChooser.selectedFile.name
+                    if(truncatedName.length > 15) {
+                        truncatedName = truncatedName.slice(0 until 15) + "..."
+                    }
+                    fileChooserLabel.text = truncatedName
                     onSelect(fileChooser.selectedFile)
                 }
                 submitButton.isEnabled = (sofaFile != null && audioFile != null)
@@ -130,7 +140,7 @@ fun entryPoint() {
         }
 
         constraints = GridBagConstraints()
-        constraints.gridx = 1
+        constraints.gridx = 0
         constraints.gridy = 3
         constraints.gridwidth = 2
         constraints.gridheight = 1
