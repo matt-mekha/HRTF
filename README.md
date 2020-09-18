@@ -17,6 +17,6 @@ Download the JAR from **Releases** and run the following command in the folder i
 ```
 java -jar HRTF.jar
 ```
-Select a SOFA file (see the **res** folder or [this database](http://sofacoustics.org/data/database/) for more some examples)
-Select an audio file (see the **res** folder for some samples).
+Select a SOFA file (see the **test-resources** folder or [this database](http://sofacoustics.org/data/database/) for examples)
+Select an audio file (see the **test-resources** folder for examples).
 Press **Run Demo** and listen with headphones!
