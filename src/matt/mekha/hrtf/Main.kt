@@ -2,14 +2,67 @@ package matt.mekha.hrtf
 
 import com.badlogic.audio.io.AudioDevice
 import com.badlogic.audio.io.Decoder
+import matt.mekha.hrtf.util.ImagePanel
+import matt.mekha.hrtf.util.decodeAudioFile
 import java.awt.*
 import java.io.File
 import javax.swing.*
 import javax.swing.filechooser.FileNameExtensionFilter
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.roundToInt
+import kotlin.math.sin
 import kotlin.random.Random
 
 var sofaFile: File? = null
 var audioFile: File? = null
+
+fun runDemo(window: JFrame, audioSource: Decoder, sofaFilePath: String) {
+    val panel = JPanel()
+    panel.layout = null
+
+    val person = ImagePanel("resources/Images/Person.jpg")
+    person.bounds = Rectangle(180, 175, 120, 110)
+    panel.add(person)
+
+    val ripple = ImagePanel("resources/Images/Ripple.png")
+    panel.add(ripple)
+
+    window.size = Dimension(500, 500)
+    window.layout = BorderLayout()
+    window.add(panel, BorderLayout.CENTER)
+    window.revalidate()
+
+    val hrtf = HeadRelatedTransferFunction(sofaFilePath)
+    val audioDevice = AudioDevice(audioSource.sampleRate)
+    val player = HrtfLocalizedAudioPlayer(hrtf, audioSource, audioDevice)
+
+    player.playAsync()
+
+    var azimuth = 0.0
+    val azimuthIncrement = Random.nextBits(1) * 30.0 - 15.0
+
+    val r = 150
+    val s = 80
+
+    while (player.isPlaying) {
+        player.sphericalCoordinates = SphericalCoordinates(azimuth, 0.0, 2.0)
+
+        val d = azimuth * PI / 180
+        val x = -r * sin(d) - s/2 + window.size.width/2
+        val y = -r * cos(d) - s/2 + window.size.height/2
+        ripple.bounds = Rectangle(x.roundToInt(), y.roundToInt(), s, s)
+
+        println(player.sphericalCoordinates)
+
+        azimuth = (azimuth + azimuthIncrement) % 360
+
+        Thread.sleep(400)
+    }
+
+    window.dispose()
+    entryPoint()
+}
 
 fun entryPoint() {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
@@ -47,36 +100,7 @@ fun entryPoint() {
             window.remove(formPanel)
             formPanel = JPanel()
 
-            fun runDemo(audioSource: Decoder, sofaFilePath: String) {
-                window.size = Dimension(500, 500)
-                window.layout = BorderLayout()
-
-                val person = JLabel(ImageIcon("Images/Person.png"))
-                person.size = Dimension(50, 50)
-                window.add(person, BorderLayout.CENTER)
-
-                val hrtf = HeadRelatedTransferFunction(sofaFilePath)
-                val audioDevice = AudioDevice(audioSource.sampleRate)
-                val player = HrtfLocalizedAudioPlayer(hrtf, audioSource, audioDevice)
-
-                player.playAsync()
-
-                var azimuth = 0.0
-                val azimuthIncrement = Random.nextBits(1) * 30.0 - 15.0
-                while (player.isPlaying) {
-                    player.sphericalCoordinates = SphericalCoordinates(azimuth, 0.0, 2.0)
-                    println(player.sphericalCoordinates)
-
-                    azimuth = (azimuth + azimuthIncrement) % 360
-
-                    Thread.sleep(400)
-                }
-
-                window.dispose()
-                Thread(::entryPoint).start()
-            }
-
-            Thread { runDemo(decodeAudioFile(audioFile!!), sofaFile!!.path) }.start()
+            Thread { runDemo(window, decodeAudioFile(audioFile!!), sofaFile!!.path) }.start()
         }
 
         fun createFileChooser(fileFilter: FileNameExtensionFilter, buttonText: String, y: Int, onSelect: (File) -> Unit) {

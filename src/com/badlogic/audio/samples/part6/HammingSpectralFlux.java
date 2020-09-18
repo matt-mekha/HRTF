@@ -10,7 +10,7 @@ import com.badlogic.audio.io.Decoder;
 import com.badlogic.audio.io.MP3Decoder;
 import com.badlogic.audio.visualization.PlaybackVisualizer;
 import com.badlogic.audio.visualization.Plot;
-import matt.mekha.hrtf.WaveDecoder2;
+import matt.mekha.hrtf.util.WaveDecoder2;
 
 public class HammingSpectralFlux 
 {

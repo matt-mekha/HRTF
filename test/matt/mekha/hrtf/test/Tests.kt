@@ -2,11 +2,10 @@ package matt.mekha.hrtf.test
 
 import com.badlogic.audio.io.AudioDevice
 import com.badlogic.audio.io.Decoder
-import matt.mekha.hrtf.HeadRelatedTransferFunction
-import matt.mekha.hrtf.HrtfLocalizedAudioPlayer
-import matt.mekha.hrtf.SphericalCoordinates
-import matt.mekha.hrtf.WaveDecoder2
+import matt.mekha.hrtf.*
+import matt.mekha.hrtf.util.WaveDecoder2
 import org.junit.Test
+import javax.swing.JFrame
 import kotlin.math.round
 import kotlin.random.Random
 
@@ -98,4 +97,14 @@ class Tests {
 
         player.saveCsv()
     }
+
+    @Test
+    fun straightToDemo() {
+        val window = JFrame("HRTF Demo")
+        window.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+        window.isResizable = false
+        window.isVisible = true
+        runDemo(window, WaveDecoder2("test-resources/Waves.wav"), "test-resources/HRTF/MIT_KEMAR.sofa")
+    }
+
 }

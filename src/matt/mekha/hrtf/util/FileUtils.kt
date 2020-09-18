@@ -1,4 +1,4 @@
-package matt.mekha.hrtf
+package matt.mekha.hrtf.util
 
 import com.badlogic.audio.io.Decoder
 import com.badlogic.audio.io.MP3Decoder

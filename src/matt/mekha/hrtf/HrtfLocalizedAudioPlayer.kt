@@ -66,7 +66,7 @@ class HrtfLocalizedAudioPlayer(
         if(logToCsv) {
             val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss"))
             synchronized(data) {
-                saveCsv("out/HRTF_Localization_Data_$time.csv", data)
+                matt.mekha.hrtf.util.saveCsv("out/HRTF_Localization_Data_$time.csv", data)
             }
         } else {
             throw IllegalStateException("Log to CSV option was false, so no data is available to save.")
