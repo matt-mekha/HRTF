@@ -13,7 +13,7 @@ A simple [Head-Related Transfer Function](https://en.wikipedia.org/wiki/Head-rel
 * Wave and MP3 file support for audio testing.
 
 ## Try it yourself
-1. Download [this JAR](https://github.com/matt-mekha/HRTF/releases/download/v0.1.0/HRTF.jar) (check for latest in [Releases](https://github.com/matt-mekha/HRTF/releases/latest)) and run the following command in the folder it's in:
+1. Download [this JAR](https://github.com/matt-mekha/HRTF/releases/download/v0.1.0/HRTF.jar) (from the [latest release](https://github.com/matt-mekha/HRTF/releases/latest)) and run the following command in the folder it's in:
 ```
 java -jar HRTF.jar
 ```
