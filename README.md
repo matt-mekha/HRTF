@@ -17,6 +17,6 @@ A simple [Head-Related Transfer Function](https://en.wikipedia.org/wiki/Head-rel
 ```
 java -jar HRTF.jar
 ```
-2. Select a SOFA file (see the [test-resources/HRTF] folder or [this database](http://sofacoustics.org/data/database/) for examples).
-3. Select an audio file (see the [test-resources] folder for examples).
+2. Select a SOFA file (see this repo's [test-resources/HRTF](test-resources/HRTF) folder or [this database](http://sofacoustics.org/data/database/) for examples).
+3. Select an audio file (see this repo's [test-resources](test-resources) folder for examples).
 4. Press **Run Demo** and listen with headphones!.
