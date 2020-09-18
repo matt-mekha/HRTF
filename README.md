@@ -13,10 +13,10 @@ A simple Head-Related Transfer Function implementation in Kotlin.
 * Wave and MP3 file support for audio testing.
 
 ## Try it yourself
-Download the JAR from **Releases** and run the following command in the folder it's in:
+1. Download the JAR from **Releases** and run the following command in the folder it's in:
 ```
 java -jar HRTF.jar
 ```
-Select a SOFA file (see the **test-resources** folder or [this database](http://sofacoustics.org/data/database/) for examples)
-Select an audio file (see the **test-resources** folder for examples).
-Press **Run Demo** and listen with headphones!
+2. Select a SOFA file (see the **test-resources** folder or [this database](http://sofacoustics.org/data/database/) for examples).
+3. Select an audio file (see the **test-resources** folder for examples).
+4. Press **Run Demo** and listen with headphones!.
