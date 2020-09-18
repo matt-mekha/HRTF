@@ -7,7 +7,7 @@ import javax.imageio.ImageIO
 import javax.swing.JPanel
 
 class ImagePanel(filePath: String) : JPanel() {
-    private val image: BufferedImage = ImageIO.read(File(filePath))
+    private val image: BufferedImage = ImageIO.read(getInternalFile(filePath))
 
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)

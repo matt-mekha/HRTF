@@ -21,11 +21,11 @@ fun runDemo(window: JFrame, audioSource: Decoder, sofaFilePath: String) {
     val panel = JPanel()
     panel.layout = null
 
-    val person = ImagePanel("resources/Images/Person.jpg")
+    val person = ImagePanel("Images/Person.jpg")
     person.bounds = Rectangle(180, 175, 120, 110)
     panel.add(person)
 
-    val ripple = ImagePanel("resources/Images/Ripple.png")
+    val ripple = ImagePanel("Images/Ripple.png")
     panel.add(ripple)
 
     window.size = Dimension(500, 500)
