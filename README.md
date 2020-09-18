@@ -1,5 +1,5 @@
 # HRTF Demo
-A simple [Head-Related Transfer Function](https://en.wikipedia.org/wiki/Head-related_transfer_function) demo in Kotlin that allows you to hear sounds with direction and elevation just using stereo headphones.
+A simple [Head-Related Transfer Function](https://en.wikipedia.org/wiki/Head-related_transfer_function) demo made in Kotlin that allows you to hear sounds with direction and elevation just using stereo headphones.
 
 ## Details
 * Frequency attenuation based on three variables: frequency, which ear, azimuth, and elevation.
