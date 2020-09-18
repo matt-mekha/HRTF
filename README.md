@@ -20,3 +20,7 @@ java -jar HRTF.jar
 2. Select a SOFA file (see this repo's [test-resources/HRTF](test-resources/HRTF) folder or [this database](http://sofacoustics.org/data/database/) for examples).
 3. Select an audio file (see this repo's [test-resources](test-resources) folder for examples).
 4. Press **Run Demo** and listen with headphones!
+
+## Credits
+* [NetCDF Java](https://www.unidata.ucar.edu/software/netcdf-java/) for decoding the SOFA files.
+* [Badlogic Audio Analysis](https://github.com/Uriopass/audio-analysis) for the [Fast Fourier Transform](https://en.wikipedia.org/wiki/Fast_Fourier_transform) implementation in Java.
