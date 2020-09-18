@@ -2,7 +2,7 @@
 A simple Head-Related Transfer Function implementation in Kotlin.
 
 ## Details
-* Frequency attenuation based on three variables: frequency, which ear, and direction.
+* Frequency attenuation based on three variables: frequency, which ear, azimuth, and elevation.
 * Distance attenuation following the inverse square law.
 * Interaural time differences to simulate the speed of sound.
 
