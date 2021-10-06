@@ -3,7 +3,7 @@ A simple [Head-Related Transfer Function](https://en.wikipedia.org/wiki/Head-rel
 
 ## Details
 * Frequency scaling based on the following variables: frequency, which ear, azimuth, and elevation.
-* Distance attenuation following the inverse square law.
+* Distance-based attenuation following the inverse square law.
 * Interaural time differences to simulate the speed of sound.
 
 ## Features
