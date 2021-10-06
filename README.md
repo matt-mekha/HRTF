@@ -8,7 +8,7 @@ A simple [Head-Related Transfer Function](https://en.wikipedia.org/wiki/Head-rel
 
 ## Features
 * Maximum of 1024 sample latency (about 22ms excluding any OS delays).
-* Can attenuate frequencies of up to 22050 Hz.
+* Can process frequencies of up to 22050 Hz.
 * SOFA file support for HRTF decoding.
 * Wave and MP3 file support for audio testing.
 
